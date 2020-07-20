@@ -9,9 +9,15 @@ library(Matrix)
 library(igraph)
 library(beepr)
 
-
-# Path to downloaded data/scripts
-setwd("~/Box/summer_research/SmCCNet-master")
+# Determine OS to set wd to downloaded data/scripts
+if(.Platform[1] == "windows"){
+  setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
+} else if(.Platform[1] == "unix"){
+  setwd("~/Box/summer_research/SmCCNet-master")
+} else {
+  print("Error: This OS is not supported. You will need to
+        specify the path to the data manually.")
+}
 
 # Additionally, must import Rscripts from SmCCNet package
 source("R/ModifiedPMA.R")
