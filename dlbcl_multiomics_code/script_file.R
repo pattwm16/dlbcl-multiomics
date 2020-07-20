@@ -64,7 +64,7 @@ c2 <- sqrt(p2 * s2) * P1P2[ , 2]; c2[c2 < 1] <- 1
 P1P2 <- P1P2[which(c1>c2), ]
 
 # Set a CV directory.
-CVDir <- paste(as.character(K), "foldCV", format(Sys.time(), "(%b.%d.%Y)/"), 
+CVDir <- paste(as.character(K), "foldCV", format(Sys.time(), "%b.%d.%Y/"), 
                sep="")
 dir.create(CVDir)
 
