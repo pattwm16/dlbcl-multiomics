@@ -16,8 +16,10 @@ set.seed(12345)
 # Specify path to code/functions from SmCCNet paper
 # Stored in Box drive, but path is dependent on OS
 if(.Platform[1] == "windows"){
+  load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
   setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
 } else if(.Platform[1] == "unix"){ 
+  load("~/Box/data/DLBCL_multi_omics.rdata")
   setwd("~/Box/summer_research/SmCCNet-master")
 } else {
   print("Error: This OS is not supported. You will need to
@@ -91,20 +93,17 @@ for(i in 1:K){
   iIdx <- foldIdx[[i]]
   x1.train <- scale(X1[-iIdx, ]) 
   x2.train <- scale(X2[-iIdx, ]) 
-  yy.train <- scale(Y[-iIdx, ]) 
   x1.test <- scale(X1[iIdx, ]) 
   x2.test <- scale(X2[iIdx, ]) 
-  yy.test <- scale(Y[iIdx, ])
-  
+
   # Check if standardized data sets are valid.
-  if(is.na(min(min(x1.train), min(x2.train), min(yy.train), min(x1.test),
-               min(x2.test), min(yy.test)))){
+  if(is.na(min(min(x1.train), min(x2.train), min(x1.test), min(x2.test)))){
     stop("Invalid scaled data. At least one of the data matrices include a 
          column with zero variance.")
   }
   subD <- paste0(CVDir, "CV_", i, "/")
   dir.create(subD)
-  save(x1.train, x2.train, yy.train, x1.test, x2.test, yy.test,
+  save(x1.train, x2.train, x1.test, x2.test,
        s1, s2, P1P2, p1, p2, SubsamplingNum, CCcoef, 
        file = paste0(subD, "Data.RData"))
 }
@@ -132,8 +131,8 @@ parSapply(cl, 1:K, function(CVidx){
     l2 <- P1P2[idx, 2]
     
     # Run SmCCA on the subsamples (Figure 1, Step II)
-    Ws <- getRobustPseudoWeights(x1.train, x2.train, yy.train, l1, l2, 
-                                 s1, s2, NoTrait = FALSE,
+    Ws <- getRobustPseudoWeights(x1.train, x2.train, NULL, l1, l2, 
+                                 s1, s2, NoTrait = TRUE,
                                  FilterByTrait = FALSE, 
                                  SubsamplingNum = SubsamplingNum, 
                                  CCcoef = CCcoef)
