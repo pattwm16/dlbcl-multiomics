@@ -7,6 +7,7 @@ library(PMA)
 library(pbapply)
 library(Matrix)
 library(igraph)
+library(stringr)
 
 # Set seed for reproducibility (TODO: delete in production code)
 # set.seed(12345)
