@@ -8,10 +8,8 @@ library(pbapply)
 library(Matrix)
 library(igraph)
 
-library(beepr) # Added beepr to alert when loop completes
-
 # Set seed for reproducibility (TODO: delete in production code)
-set.seed(12345)
+# set.seed(12345)
 
 # Specify path to code/functions from SmCCNet paper
 # Stored in Box drive, but path is dependent on OS
@@ -19,8 +17,8 @@ if(.Platform[1] == "windows"){
   load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
   setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
 } else if(.Platform[1] == "unix"){ 
-  load("~/Box/data/DLBCL_multi_omics.rdata")
-  setwd("~/Box/summer_research/SmCCNet-master")
+  load("DLBCL_multi_omics.rdata")
+  #setwd("SmCCNet-master")
 } else {
   print("Error: This OS is not supported. You will need to
         specify the path to the data manually.")
@@ -173,9 +171,6 @@ parSapply(cl, 1:K, function(CVidx){
   system(paste0("rm ", subD, "temp.RData"))
   return(CVidx)
 })
-
-# Notify me that it completed
-beep(8)
 
 # Close cluster
 stopCluster(cl)
