@@ -143,12 +143,12 @@ parSapply(cl, 1:K, function(CVidx){
     
     # Compute the prediction error for given CV fold and sparsity penalties.
     if(is.null(CCcoef)){CCcoef <- rep(1, 3)} # Unweighted SmCCA.
-    rho.train <- cor(x1.train %*% v, x2.train %*% u) * CCcoef[1] + 
-      cor(x1.train %*% v, yy.train) * CCcoef[2] + 
-      cor(x2.train %*% u, yy.train) * CCcoef[3]
-    rho.test <- cor(x1.test %*% v, x2.test %*% u) * CCcoef[1] +
-      cor(x1.test %*% v, yy.test) * CCcoef[2] + 
-      cor(x2.test %*% u, yy.test) * CCcoef[3]
+    rho.train <- cor(x1.train %*% v, x2.train %*% u) * CCcoef[1] #+ 
+      #cor(x1.train %*% v, yy.train) * CCcoef[2] + 
+      #cor(x2.train %*% u, yy.train) * CCcoef[3]
+    rho.test <- cor(x1.test %*% v, x2.test %*% u) * CCcoef[1] #+
+      #cor(x1.test %*% v, yy.test) * CCcoef[2] + 
+      #cor(x2.test %*% u, yy.test) * CCcoef[3]
     RhoTrain[idx] <- round(rho.train, digits = 5)
     RhoTest[idx] <- round(rho.test, digits = 5)
     DeltaCor[idx] <- abs(rho.train - rho.test)
