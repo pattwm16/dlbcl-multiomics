@@ -36,10 +36,10 @@ source("R/SmCCNetSource.R")
 
 # Load diff_exp_dimreduction.R which selects a reduced # of features
 # Values should be:
-#   Expression DRvR: unadjusted p-values (ꭤ = 0.05), n=1990
-#   Expression DRvDC: unadjusted p-values (ꭤ = 0.05), n=1870
-#   Methylation DRvR: unadjusted p-values (ꭤ = 0.05), n=23744
-#   Methylation DRvDC: adjusted p-values (ꭤ = 0.05), n=93434
+#   Expression DRvR: unadjusted p-values (alpha = 0.05), n=1990
+#   Expression DRvDC: unadjusted p-values (alpha = 0.05), n=1870
+#   Methylation DRvR: unadjusted p-values (alpha = 0.05), n=23744
+#   Methylation DRvDC: adjusted p-values (alpha = 0.05), n=93434
 source("../diff_exp_dimreduction/diff_exp_dimreduction.R")
 
 # Select the analysis that is being performed
