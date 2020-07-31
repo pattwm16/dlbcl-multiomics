@@ -10,18 +10,6 @@ diff_exp_dimreduction <-function(analysis){
 # Import libraries
 library(limma)
 
-# Load in data ----
-if(.Platform[1] == "windows"){
-  load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
-  setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
-} else if(.Platform[1] == "unix"){ 
-  load("~/Box/data/DLBCL_multi_omics.rdata")
-  setwd("~/Desktop/CCLCM/Research/dlbcl-multiomics/diff_exp_dimreduction")
-} else {
-  print("Error: This OS is not supported. You will need to
-        specify the path to the data manually.")
-}
-
 # Perform differential expression analysis ----
 ## choose the corresponding data for DR and R
 DRR <- which(wk.pheno$Status %in% c("Diagnostic","Relapsed"))

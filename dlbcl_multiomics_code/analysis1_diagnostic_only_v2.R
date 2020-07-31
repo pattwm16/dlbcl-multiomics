@@ -17,9 +17,13 @@ library(stringr)
 if(.Platform[1] == "windows"){
   load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
   setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
-} else if(.Platform[1] == "unix"){ 
+} else if(Sys.info()[1] == "Darwin"){ 
   load("~/Box/data/DLBCL_multi_omics.rdata")
   setwd("~/Box/summer_research/SmCCNet-master")
+} else if(.Platform[1] == "unix"){ 
+  #load("~/Box/data/DLBCL_multi_omics.rdata")
+  #setwd("~/Box/summer_research/SmCCNet-master")
+  load("DLBCL_multi_omics.rdata")
 } else {
   print("Error: This OS is not supported. You will need to
         specify the path to the data manually.")
@@ -40,7 +44,7 @@ source("R/SmCCNetSource.R")
 #   Expression DRvDC: unadjusted p-values (alpha = 0.05), n=1870
 #   Methylation DRvR: unadjusted p-values (alpha = 0.05), n=23744
 #   Methylation DRvDC: adjusted p-values (alpha = 0.05), n=93434
-source("../diff_exp_dimreduction/diff_exp_dimreduction.R")
+source("diff_exp_dimreduction.R")
 
 # Select the analysis that is being performed
 reduced_features <- diff_exp_dimreduction(1)
@@ -87,7 +91,7 @@ AbarLabel <- c(colnames(cbind(X1, X2)))
 K <- 3 # num folds in k-fold cross val
 CCcoef <- NULL # unweighted version of SmCCNet
 s1 <- 0.7; s2 <- 0.9 # feature sampling proportions 
-SubsamplingNum <- 3 # num of subsamples
+SubsamplingNum <- 500 # num of subsamples
 
 # Create sparsity penalty options.
 pen1 <- seq(.05, .3, by = .05) 
@@ -209,7 +213,7 @@ for(j in 1:K){
 
 S1 <- rowMeans(testCC)
 S2 <- rowMeans(predError)
-T12 <- dCorT[ , -3]; T12[ , 3] <- S1; T12[ , 4] <- Ss2
+T12 <- dCorT[ , -3]; T12[ , 3] <- S1; T12[ , 4] <- S2
 write.csv(T12, file = paste0(CVDir, "TotalPredictionError.csv"))
 
 # Visualization ----
