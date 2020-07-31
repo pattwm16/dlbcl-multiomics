@@ -18,8 +18,8 @@ if(.Platform[1] == "windows"){
   load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
   setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
 } else if(.Platform[1] == "unix"){ 
-  load("DLBCL_multi_omics.rdata")
-  #setwd("SmCCNet-master")
+  load("~/Box/data/DLBCL_multi_omics.rdata")
+  setwd("~/Box/summer_research/SmCCNet-master")
 } else {
   print("Error: This OS is not supported. You will need to
         specify the path to the data manually.")
@@ -29,7 +29,27 @@ if(.Platform[1] == "windows"){
 source("R/ModifiedPMA.R")
 source("R/SmCCNetSource.R")
 
-# Load in data ----
+# Data Cleaning/Dimensionality Reduction----
+
+# Reduce the number of features we will analyse to only those that
+# have significant changes (Diff exp/methylation analysis)
+
+# Load diff_exp_dimreduction.R which selects a reduced # of features
+# Values should be:
+#   Expression DRvR: unadjusted p-values (ꭤ = 0.05), n=1990
+#   Expression DRvDC: unadjusted p-values (ꭤ = 0.05), n=1870
+#   Methylation DRvR: unadjusted p-values (ꭤ = 0.05), n=23744
+#   Methylation DRvDC: adjusted p-values (ꭤ = 0.05), n=93434
+source("../diff_exp_dimreduction/diff_exp_dimreduction.R")
+
+# Select the analysis that is being performed
+reduced_features <- diff_exp_dimreduction(1)
+reduced_gene_set <- row.names(reduced_features$TG_DRR)
+reduced_meth_set <- row.names(reduced_features$TS_DRR)
+
+# Subset expression and methylation data to reduced features
+cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
+wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
 
 # First Analysis (Diagnostic samples only) ----
 
@@ -67,7 +87,7 @@ AbarLabel <- c(colnames(cbind(X1, X2)))
 K <- 3 # num folds in k-fold cross val
 CCcoef <- NULL # unweighted version of SmCCNet
 s1 <- 0.7; s2 <- 0.9 # feature sampling proportions 
-SubsamplingNum <- 1000 # num of subsamples
+SubsamplingNum <- 3 # num of subsamples
 
 # Create sparsity penalty options.
 pen1 <- seq(.05, .3, by = .05) 
@@ -189,7 +209,7 @@ for(j in 1:K){
 
 S1 <- rowMeans(testCC)
 S2 <- rowMeans(predError)
-T12 <- dCorT[ , -3]; T12[ , 3] <- S1; T12[ , 4] <- S2
+T12 <- dCorT[ , -3]; T12[ , 3] <- S1; T12[ , 4] <- Ss2
 write.csv(T12, file = paste0(CVDir, "TotalPredictionError.csv"))
 
 # Visualization ----
