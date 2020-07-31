@@ -17,13 +17,16 @@ library(stringr)
 if(.Platform[1] == "windows"){
   load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
   setwd("C:/Users/patterw/Box/summer_research/SmCCNet-master")
+  viz <- TRUE
 } else if(Sys.info()[1] == "Darwin"){ 
   load("~/Box/data/DLBCL_multi_omics.rdata")
   setwd("~/Box/summer_research/SmCCNet-master")
+  viz <- TRUE
 } else if(.Platform[1] == "unix"){ 
   #load("~/Box/data/DLBCL_multi_omics.rdata")
   #setwd("~/Box/summer_research/SmCCNet-master")
   load("DLBCL_multi_omics.rdata")
+  viz <- FALSE
 } else {
   print("Error: This OS is not supported. You will need to
         specify the path to the data manually.")
@@ -217,35 +220,38 @@ T12 <- dCorT[ , -3]; T12[ , 3] <- S1; T12[ , 4] <- S2
 write.csv(T12, file = paste0(CVDir, "TotalPredictionError.csv"))
 
 # Visualization ----
-library(plotly)
-library(reshape2)
-
-f1 <- list(
-  family = "Arial, sans-serif",
-  size = 20,
-  color = "black"
-)
-f2 <- list(
-  family = "Old Standard TT, serif",
-  size = 20,
-  color = "black"
-)
-a <- list(
-  title = "l1",
-  titlefont = f1,
-  showticklabels = TRUE,
-  tickfont = f2
-)
-b <- list(
-  title = "l2",
-  titlefont = f1,
-  showticklabels = TRUE,
-  tickfont = f2
-)
-hmelt <- melt(T12[ , -3], id.vars = c("l1", "l2"))
-contourPlot <- plot_ly(hmelt, x = ~l1, y = ~l2, z = ~value, type = "contour") %>%
-  layout(xaxis = a, yaxis = b, showlegend = TRUE, legend = f1)  
-export(contourPlot, file = paste0(CVDir, "TotalPredictionError.pdf"))
+if (viz){
+  library(plotly)
+  library(webshot)
+  library(reshape2)
+  
+  f1 <- list(
+    family = "Arial, sans-serif",
+    size = 20,
+    color = "black"
+  )
+  f2 <- list(
+    family = "Old Standard TT, serif",
+    size = 20,
+    color = "black"
+  )
+  a <- list(
+    title = "l1",
+    titlefont = f1,
+    showticklabels = TRUE,
+    tickfont = f2
+  )
+  b <- list(
+    title = "l2",
+    titlefont = f1,
+    showticklabels = TRUE,
+    tickfont = f2
+  )
+  hmelt <- melt(T12[ , -3], id.vars = c("l1", "l2"))
+  contourPlot <- plot_ly(hmelt, x = ~l1, y = ~l2, z = ~value, type = "contour") %>%
+    layout(xaxis = a, yaxis = b, showlegend = TRUE, legend = f1)  
+  export(contourPlot, file = paste0(CVDir, "TotalPredictionError.pdf"))
+}
 
 pen <- which(S2 == min(S2))
 l1 <- T12$l1[pen]; l2 <- T12$l2[pen]
