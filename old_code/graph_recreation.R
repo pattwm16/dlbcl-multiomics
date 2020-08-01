@@ -36,7 +36,7 @@ AbarLabel <- c(colnames(cbind(X1, X2)))
 K <- 3 # num folds in k-fold cross val
 CCcoef <- NULL # unweighted version of SmCCNet
 s1 <- 0.7; s2 <- 0.9 # feature sampling proportions 
-SubsamplingNum <- 1000 # num of subsamples
+SubsamplingNum <- 3 # num of subsamples
 
 # Create sparsity penalty options.
 pen1 <- seq(.05, .3, by = .05) 
@@ -216,7 +216,7 @@ save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeights.RData"))
 
 # Cut out edges with weight less than edgeCut
 bigCor <- cor(cbind(X1, X2))
-edgeCut <- 0.1
+edgeCut <- 0.2
 for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 

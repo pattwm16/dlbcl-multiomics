@@ -265,6 +265,7 @@ Ws <- getRobustPseudoWeights(X1, X2, NULL, l1, l2, s1, s2,
 # Remove unused large vars before next memory intensive step
 rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, cpm.rna_diagnostic,
    X1, X2)
+gc()
 
 Abar <- getAbar(Ws, FeatureLabel = AbarLabel) # had to add "FeatureLabel =" here, not sure if kosher...
 
@@ -275,7 +276,7 @@ save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeights.RData"))
 
 # Cut out edges with weight less than edgeCut
 bigCor <- cor(cbind(X1, X2))
-edgeCut <- 0.1
+edgeCut <- 0.2
 for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
