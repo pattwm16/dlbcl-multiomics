@@ -23,24 +23,8 @@ if(.Platform[1] == "windows"){
 source("R/ModifiedPMA.R")
 source("R/SmCCNetSource.R")
 
-# First Analysis (Diagnostic samples only) ----
-
-# Find the sample values and patient numbers that have
-# diagnostic status (should be 13)
-diagnostic_pts <- subset(wk.pheno, Status == "Diagnostic")
-
-# Select only diagnostic pt data for wk.gene and wk.methy
-## Subsetting cpm.rna matrix
-cpm.rna_diagnostic <- subset(cpm.rna, select = as.matrix(diagnostic_pts[1]))
-
-## Subsetting wk.methy matrix
-sample_idx_wk.methy <- str_extract(colnames(wk.methy), "NG\\d+") %in%
-                        as.matrix(diagnostic_pts[1])
-wk.methy_diagnostic <- subset(wk.methy, select = sample_idx_wk.methy)
-
-
 # Load in synthetic example data
-#load("data/ExampleData.RData")
+load("data/ExampleData.RData")
 
 # Define num of features for each variate + num of subjects
 p1 <- ncol(X1)
