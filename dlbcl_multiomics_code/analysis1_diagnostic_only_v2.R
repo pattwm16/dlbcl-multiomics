@@ -261,6 +261,11 @@ print(paste0("Optimal penalty pair (l1, l2): (", l1, ",", l2, ")"))
 Ws <- getRobustPseudoWeights(X1, X2, NULL, l1, l2, s1, s2, 
                              NoTrait = TRUE, FilterByTrait = FALSE, 
                              SubsamplingNum = SubsamplingNum, CCcoef = CCcoef)
+
+# Remove unused large vars before next memory intensive step
+rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, cpm.rna_diagnostic,
+   X1, X2)
+
 Abar <- getAbar(Ws, FeatureLabel = AbarLabel) # had to add "FeatureLabel =" here, not sure if kosher...
 
 # Get multi-omics modules and plot subnetworks
