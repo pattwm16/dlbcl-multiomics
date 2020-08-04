@@ -21,7 +21,8 @@ fitDRR <- lmFit(rnaDRR, design = design)
 fitDRR <- eBayes(fitDRR)
 
 # check the top genes using topTable()
-top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf)
+top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf,
+                          adjust.method = "BY")
 top_genes_DRR <- subset(top_genes_DRR, P.Value <= 0.05)
 
 ## For DR vs. DC
@@ -33,7 +34,8 @@ design <- model.matrix(~ Status, data = datDRDC) # no patient here since these a
 fitDRDC <- lmFit(rnaDRDC, design = design)
 fitDRDC <- eBayes(fitDRDC)
 
-top_genes_DRDC <- topTable(fitDRDC, coef = 2, number = Inf)
+top_genes_DRDC <- topTable(fitDRDC, coef = 2, number = Inf,
+                           adjust.method="BH")
 top_genes_DRDC <- subset(top_genes_DRDC, P.Value <= 0.05)
 
 

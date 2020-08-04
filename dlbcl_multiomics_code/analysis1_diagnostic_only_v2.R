@@ -47,7 +47,9 @@ source("R/SmCCNetSource.R")
 #   Expression DRvDC: unadjusted p-values (alpha = 0.05), n=1870
 #   Methylation DRvR: unadjusted p-values (alpha = 0.05), n=23744
 #   Methylation DRvDC: adjusted p-values (alpha = 0.05), n=93434
+#source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/diff_exp_dimreduction.R")
 source("diff_exp_dimreduction.R")
+
 
 # Select the analysis that is being performed
 reduced_features <- diff_exp_dimreduction(1)
@@ -247,6 +249,7 @@ if (viz){
     showticklabels = TRUE,
     tickfont = f2
   )
+  # [,-3] removes phenotype column, if not including phenotype, get rid of it
   hmelt <- melt(T12[ , -3], id.vars = c("l1", "l2"))
   contourPlot <- plot_ly(hmelt, x = ~l1, y = ~l2, z = ~value, type = "contour") %>%
     layout(xaxis = a, yaxis = b, showlegend = TRUE, legend = f1)  
@@ -267,16 +270,25 @@ rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, cpm.rna_diagnostic
    X1, X2)
 gc()
 
+# Get adjacency matrix (MEM INTENSIVE)
 Abar <- getAbar(Ws, FeatureLabel = AbarLabel) # had to add "FeatureLabel =" here, not sure if kosher...
 
 # Get multi-omics modules and plot subnetworks
 Modules <- getMultiOmicsModules(Abar, p1)
 save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeights.RData"))
 
-
 # Cut out edges with weight less than edgeCut
 bigCor <- cor(cbind(X1, X2))
-edgeCut <- 0.2
+edgeCut <- 0.9
+
+# Before producing nets, attempt to use wk.gene to
+# replace row/col names with Gene IDs
+if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
+  revised_lst <- dplyr::recode(
+    colnames(Abar), 
+    !!!setNames(as.character(wk.gene$gene), wk.gene$id))
+}
+
 for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
@@ -284,5 +296,3 @@ for(idx in 1:length(Modules)){
                         EdgeCut = edgeCut, FeatureLabel = AbarLabel,
                         SaveFile = filename)
 }
-
-
