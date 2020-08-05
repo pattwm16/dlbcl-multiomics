@@ -271,7 +271,7 @@ rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, cpm.rna_diagnostic
 gc()
 
 # Get adjacency matrix (MEM INTENSIVE)
-Abar <- getAbar(Ws, FeatureLabel = AbarLabel) # had to add "FeatureLabel =" here, not sure if kosher...
+Abar <- getAbar(Ws, FeatureLabel = AbarLabel)
 
 # Get multi-omics modules and plot subnetworks
 Modules <- getMultiOmicsModules(Abar, p1)
@@ -289,6 +289,7 @@ if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
     !!!setNames(as.character(wk.gene$gene), wk.gene$id))
 }
 
+# Produce gene networks from adjacency network
 for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
