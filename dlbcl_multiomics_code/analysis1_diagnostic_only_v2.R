@@ -34,7 +34,7 @@ if(.Platform[1] == "windows"){
 
 # Import essential Rscripts from SmCCNet project
 source("R/ModifiedPMA.R")
-source("R/SmCCNetSource.R")
+source("R/SmCCNetSource_forcelayout.R")
 
 # Data Cleaning/Dimensionality Reduction----
 
@@ -279,13 +279,20 @@ save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeights.RData"))
 
 # Cut out edges with weight less than edgeCut
 bigCor <- cor(cbind(X1, X2))
-edgeCut <- 0.9
+edgeCut <- 0.4
 
-# Before producing nets, attempt to use wk.gene to
+# Before producing nets, use wk.gene to
 # replace row/col names with Gene IDs
 if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
-  revised_lst <- dplyr::recode(
-    colnames(Abar), 
+  # There are ~556 NA values (and many other blank string values)
+  # TODO: Ask Bo about difference between NA vs. "" values in wk.gene
+  
+  # Replace NA with "" values
+  wk.gene[which(is.na(wk.gene$gene)),]$gene <- ""
+  # If gene ID is empty string, use the Ensemble ID
+  wk.gene[which(wk.gene[,2] == ""),2] <- wk.gene[which(wk.gene[,2] == ""),1]
+  revised_labels <- dplyr::recode(
+    AbarLabel, 
     !!!setNames(as.character(wk.gene$gene), wk.gene$id))
 }
 
@@ -293,6 +300,10 @@ for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
                         multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = AbarLabel,
-                        SaveFile = filename)
+                        EdgeCut = edgeCut, FeatureLabel = revised_labels, SaveFile = filename)
 }
+
+# plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
+#                       multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1,
+#                       EdgeCut = edgeCut, FeatureLabel = revised_labels,
+#                       VertexLabelCex = 0.2)
