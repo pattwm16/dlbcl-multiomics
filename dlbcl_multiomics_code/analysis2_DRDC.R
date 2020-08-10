@@ -50,9 +50,9 @@ source("diff_exp_dimreduction.R")
 
 
 # Select the analysis that is being performed
-reduced_features <- diff_exp_dimreduction(1)
-reduced_gene_set <- row.names(reduced_features$TG_DRR)
-reduced_meth_set <- row.names(reduced_features$TS_DRR)
+reduced_features <- diff_exp_dimreduction(2)
+reduced_gene_set <- row.names(reduced_features$TG_DRDC)
+reduced_meth_set <- row.names(reduced_features$TS_DRDC)
 
 # Subset expression and methylation data to reduced features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
@@ -61,23 +61,23 @@ wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
 # First Analysis (Diagnostic samples only) ----
 
 # Find the sample values and patient numbers that have
-# diagnostic status (should be 13)
-# TODO: Ask Bo if this is right (or should be Diagnostic + Relapsed)
-diagnostic_pts <- subset(wk.pheno, Status == "Diagnostic")
+# diagnostic and cured status (n=22)
+dc_pts <- subset(wk.pheno, Status %in% c("Diagnostic","Cured"))
 
 # Select only diagnostic pt data for wk.gene and wk.methy
 ## Subsetting cpm.rna matrix
-cpm.rna_diagnostic <- subset(cpm.rna, select = as.matrix(diagnostic_pts[1]))
+cpm.rna_dc <- subset(cpm.rna, select = as.matrix(dc_pts[1]))
 
 ## Subsetting wk.methy matrix
 sample_idx_wk.methy <- str_extract(colnames(wk.methy), "NG\\d+") %in%
-  as.matrix(diagnostic_pts[1])
-wk.methy_diagnostic <- subset(wk.methy, select = sample_idx_wk.methy)
+  as.matrix(dc_pts[1])
+wk.methy_dc <- subset(wk.methy, select = sample_idx_wk.methy)
 
 
 # Load in data as symbolic form
-X1 <- t(wk.methy_diagnostic)
-X2 <- t(cpm.rna_diagnostic)
+X1 <- t(wk.methy_dc)
+X2 <- t(cpm.rna_dc)
+Y <- matrix(dc_pts$Status, dimnames = list(dc_pts$sample, c("Status")))
 
 # Apply SmCCNet functions to multi-omics data ----
 
@@ -119,9 +119,12 @@ foldIdx <- split(1:n, sample(1:n, K))
 for(i in 1:K){
   iIdx <- foldIdx[[i]]
   x1.train <- scale(X1[-iIdx, ]) 
-  x2.train <- scale(X2[-iIdx, ]) 
+  x2.train <- scale(X2[-iIdx, ])
+  yy.train <- scale(Y[-iIdx, ]) 
   x1.test <- scale(X1[iIdx, ]) 
-  x2.test <- scale(X2[iIdx, ]) 
+  x2.test <- scale(X2[iIdx, ])
+  yy.test <- scale(Y[iIdx, ])
+  
 
   # Check if standardized data sets are valid.
   if(is.na(min(min(x1.train), min(x2.train), min(x1.test), min(x2.test)))){
@@ -130,7 +133,7 @@ for(i in 1:K){
   }
   subD <- paste0(CVDir, "CV_", i, "/")
   dir.create(subD)
-  save(x1.train, x2.train, x1.test, x2.test,
+  save(x1.train, x2.train, yy.train, x1.test, x2.test, yy.test,
        s1, s2, P1P2, p1, p2, SubsamplingNum, CCcoef, 
        file = paste0(subD, "Data.RData"))
 }
@@ -158,9 +161,9 @@ parSapply(cl, 1:K, function(CVidx){
     l2 <- P1P2[idx, 2]
     
     # Run SmCCA on the subsamples (Figure 1, Step II)
-    Ws <- getRobustPseudoWeights(x1.train, x2.train, NULL, l1, l2, 
-                                 s1, s2, NoTrait = TRUE,
-                                 FilterByTrait = FALSE, 
+    Ws <- getRobustPseudoWeights(x1.train, x2.train, yy.train, l1, l2, 
+                                 s1, s2, NoTrait = FALSE,
+                                 FilterByTrait = TRUE, 
                                  SubsamplingNum = SubsamplingNum, 
                                  CCcoef = CCcoef)
     
@@ -171,12 +174,12 @@ parSapply(cl, 1:K, function(CVidx){
     
     # Compute the prediction error for given CV fold and sparsity penalties.
     if(is.null(CCcoef)){CCcoef <- rep(1, 3)} # Unweighted SmCCA.
-    rho.train <- cor(x1.train %*% v, x2.train %*% u) * CCcoef[1] #+ 
-      #cor(x1.train %*% v, yy.train) * CCcoef[2] + 
-      #cor(x2.train %*% u, yy.train) * CCcoef[3]
-    rho.test <- cor(x1.test %*% v, x2.test %*% u) * CCcoef[1] #+
-      #cor(x1.test %*% v, yy.test) * CCcoef[2] + 
-      #cor(x2.test %*% u, yy.test) * CCcoef[3]
+    rho.train <- cor(x1.train %*% v, x2.train %*% u) * CCcoef[1] + 
+      cor(x1.train %*% v, yy.train) * CCcoef[2] + 
+      cor(x2.train %*% u, yy.train) * CCcoef[3]
+    rho.test <- cor(x1.test %*% v, x2.test %*% u) * CCcoef[1] +
+      cor(x1.test %*% v, yy.test) * CCcoef[2] + 
+      cor(x2.test %*% u, yy.test) * CCcoef[3]
     RhoTrain[idx] <- round(rho.train, digits = 5)
     RhoTest[idx] <- round(rho.test, digits = 5)
     DeltaCor[idx] <- abs(rho.train - rho.test)
@@ -260,8 +263,8 @@ l1 <- T12$l1[pen]; l2 <- T12$l2[pen]
 print(paste0("Optimal penalty pair (l1, l2): (", l1, ",", l2, ")"))
 
 # Integrate two omics data types and a quantitative phenotype ----
-Ws <- getRobustPseudoWeights(X1, X2, NULL, l1, l2, s1, s2, 
-                             NoTrait = TRUE, FilterByTrait = FALSE, 
+Ws <- getRobustPseudoWeights(X1, X2, Y, l1, l2, s1, s2, 
+                             NoTrait = FALSE, FilterByTrait = TRUE, 
                              SubsamplingNum = SubsamplingNum, CCcoef = CCcoef)
 
 # Remove unused large vars before next memory intensive step
@@ -300,7 +303,7 @@ for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
                         multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = revised_labels, SaveFile = filename)
+                        EdgeCut = edgeCut, FeatureLabel = AbarLabel, SaveFile = filename)
 }
 
 plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
