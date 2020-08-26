@@ -51,8 +51,15 @@ source("diff_exp_dimreduction.R")
 
 # Select the analysis that is being performed
 reduced_features <- diff_exp_dimreduction(1)
-reduced_gene_set <- row.names(reduced_features$TG_DRR)
-reduced_meth_set <- row.names(reduced_features$TS_DRR)
+
+# Pull out only labelled genes and methylsites
+labelled_features    <- trim_out_unlabelled_data()
+
+# Pull out only reduced features that are labelled (intersect of sets)
+reduced_gene_set <- intersect(row.names(reduced_features$TG_DRDC), 
+                              labelled_features$Genes$id)
+reduced_meth_set <- intersect(row.names(reduced_features$TS_DRDC), 
+                              row.names(labelled_features$MethylSites))
 
 # Subset expression and methylation data to reduced features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)

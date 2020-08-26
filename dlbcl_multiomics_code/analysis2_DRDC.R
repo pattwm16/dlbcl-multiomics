@@ -49,7 +49,6 @@ source("../trim_out_unlabelled_data.R")
 # Select the analysis that is being performed and reduce dims using diff exp.
 reduced_features <- diff_exp_dimreduction(2)
 
-
 # Pull out only labelled genes and methylsites
 labelled_features    <- trim_out_unlabelled_data()
 labelled_genes       <- row.names(labelled_features$Genes)
