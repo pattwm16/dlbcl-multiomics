@@ -47,6 +47,7 @@ source("R/SmCCNetSource_forcelayout.R")
 #   Methylation DRvDC: adjusted p-values (alpha = 0.05), n=93434
 #source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/diff_exp_dimreduction.R")
 source("diff_exp_dimreduction.R")
+source("trim_out_unlabelled_data.R")
 
 
 # Select the analysis that is being performed
