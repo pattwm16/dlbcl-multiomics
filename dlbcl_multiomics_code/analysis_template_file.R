@@ -46,7 +46,7 @@ sample_idx_wk.methy <- str_extract(colnames(wk.methy), "NG\\d+") %in%
 wk.methy_diagnostic <- subset(wk.methy, select = sample_idx_wk.methy)
 
 
-# Load in data as symbolic form
+# Load in data (should be samples x probes)
 X1 <- t(cpm.rna_diagnostic)
 X2 <- t(wk.methy_diagnostic)
 

@@ -23,8 +23,6 @@ if(.Platform[1] == "windows"){
   setwd("~/Box/summer_research/SmCCNet-master")
   viz <- TRUE
 } else if(.Platform[1] == "unix"){ 
-  #load("~/Box/data/DLBCL_multi_omics.rdata")
-  #setwd("~/Box/summer_research/SmCCNet-master")
   load("DLBCL_multi_omics.rdata")
   viz <- FALSE
 } else {
@@ -64,6 +62,7 @@ wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
 
 # Find the sample values and patient numbers that have
 # diagnostic status (should be 13)
+# TODO: Ask Bo if this is right (or should be Diagnostic + Relapsed)
 diagnostic_pts <- subset(wk.pheno, Status == "Diagnostic")
 
 # Select only diagnostic pt data for wk.gene and wk.methy
@@ -99,8 +98,8 @@ s1 <- 0.7; s2 <- 0.9 # feature sampling proportions
 SubsamplingNum <- 500 # num of subsamples
 
 # Create sparsity penalty options.
-pen1 <- seq(.05, .3, by = .05) 
-pen2 <- seq(.05, .3, by = .05) 
+pen1 <- seq(.1, .9, by = .1) 
+pen2 <- seq(.1, .9, by = .1) 
 P1P2 <- expand.grid(pen1, pen2) # Map (l1, l2) to (c1, c2).
 c1 <- sqrt(p1 * s1) * P1P2[ , 1]; c1[c1] <- 1
 c2 <- sqrt(p2 * s2) * P1P2[ , 2]; c2[c2 < 1] <- 1
@@ -304,7 +303,7 @@ for(idx in 1:length(Modules)){
                         EdgeCut = edgeCut, FeatureLabel = revised_labels, SaveFile = filename)
 }
 
-# plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
-#                       multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1,
-#                       EdgeCut = edgeCut, FeatureLabel = revised_labels,
-#                       VertexLabelCex = 0.2)
+plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
+                      multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1,
+                      EdgeCut = edgeCut, FeatureLabel = revised_labels,
+                      VertexLabelCex = 0.2)
