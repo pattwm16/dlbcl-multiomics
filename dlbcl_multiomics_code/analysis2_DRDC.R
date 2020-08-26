@@ -51,8 +51,6 @@ reduced_features <- diff_exp_dimreduction(2)
 
 # Pull out only labelled genes and methylsites
 labelled_features    <- trim_out_unlabelled_data()
-labelled_genes       <- row.names(labelled_features$Genes)
-labelled_methylsites <- row.names(labelled_features$MethylSites)
 
 # Pull out only reduced features that are labelled (intersect of sets)
 reduced_gene_set <- intersect(row.names(reduced_features$TG_DRDC), 
@@ -63,6 +61,10 @@ reduced_meth_set <- intersect(row.names(reduced_features$TS_DRDC),
 # Subset expression and methylation data to reduced/labelled features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
 wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
+
+# Add gene names to wk.methy
+row.names(wk.methy) <- subset(FullAnnot, 
+                              FullAnnot$Name %in% row.names(wk.methy))$UCSC_RefGene_Name
 
 # First Analysis (Diagnostic samples only) ----
 
@@ -304,9 +306,6 @@ if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
   revised_labels <- dplyr::recode(
     AbarLabel, 
     !!!setNames(as.character(wk.gene$gene), wk.gene$id))
-  revised_labels <- dplyr::recode(
-    revised_labels, 
-    !!!setNames(as.character(FullAnnot$UCSC_RefGene_Name), FullAnnot$Name))
 }
 
 # Produce gene networks from adjacency network

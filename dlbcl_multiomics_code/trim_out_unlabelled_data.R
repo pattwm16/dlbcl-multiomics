@@ -17,12 +17,16 @@ trim_out_unlabelled_data <- function(){
   FullAnnot = FullAnnot[,c("Name","UCSC_RefGene_Name")]
   
   # collect the unlabelled methyl sites
-  unlabelled_methylsites <- FullAnnot[which(FullAnnot[,2] == ""),]
+  unlabelled_methylsites <- FullAnnot[which(FullAnnot[,2] == ""),]$Name
+  
+  # Correction for 219 missing values from wk.methy
+  unlabelled_methylsites <- append(unlabelled_methylsites,
+                                   setdiff(row.names(wk.methy), FullAnnot$Name))
+  
   
   # subset labelled genes
   labelled_methylsites <- subset(wk.methy, !rownames(wk.methy) %in% 
-                                              unlabelled_methylsites$Name)
-  
+                                              unlabelled_methylsites)
   
   return(list("Genes" = labelled_genes, "MethylSites" = labelled_methylsites))
 }
