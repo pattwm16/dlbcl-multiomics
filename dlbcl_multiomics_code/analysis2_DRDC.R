@@ -9,9 +9,6 @@ library(Matrix)
 library(igraph)
 library(stringr)
 
-# Set seed for reproducibility (TODO: delete in production code)
-# set.seed(12345)
-
 # Specify path to code/functions from SmCCNet paper
 # Stored in Box drive, but path is dependent on OS
 if(.Platform[1] == "windows"){
@@ -47,14 +44,24 @@ source("../R/SmCCNetSource_forcelayout.R")
 #   Methylation DRvDC: adjusted p-values (alpha = 0.05), n=93434
 #source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/diff_exp_dimreduction.R")
 source("../diff_exp_dimreduction.R")
+source("../trim_out_unlabelled_data.R")
 
-
-# Select the analysis that is being performed
+# Select the analysis that is being performed and reduce dims using diff exp.
 reduced_features <- diff_exp_dimreduction(2)
-reduced_gene_set <- row.names(reduced_features$TG_DRDC)
-reduced_meth_set <- row.names(reduced_features$TS_DRDC)
 
-# Subset expression and methylation data to reduced features
+
+# Pull out only labelled genes and methylsites
+labelled_features    <- trim_out_unlabelled_data()
+labelled_genes       <- row.names(labelled_features$Genes)
+labelled_methylsites <- row.names(labelled_features$MethylSites)
+
+# Pull out only reduced features that are labelled (intersect of sets)
+reduced_gene_set <- intersect(row.names(reduced_features$TG_DRDC), 
+                              labelled_features$Genes$id)
+reduced_meth_set <- intersect(row.names(reduced_features$TS_DRDC), 
+                              row.names(labelled_features$MethylSites))
+
+# Subset expression and methylation data to reduced/labelled features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
 wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
 
@@ -291,8 +298,6 @@ edgeCut <- 0.4
 # replace row/col names with Gene IDs
 if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
   # There are ~556 NA values (and many other blank string values)
-  # TODO: Ask Bo about difference between NA vs. "" values in wk.gene
-  
   # Replace NA with "" values
   wk.gene[which(is.na(wk.gene$gene)),]$gene <- ""
   # If gene ID is empty string, use the Ensemble ID
