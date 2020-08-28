@@ -47,16 +47,18 @@ source("../diff_exp_dimreduction.R")
 source("../trim_out_unlabelled_data.R")
 
 # Select the analysis that is being performed and reduce dims using diff exp.
-reduced_features <- diff_exp_dimreduction(2)
+reduced_features  <- diff_exp_dimreduction(2)
 
 # Pull out only labelled genes and methylsites
-labelled_features    <- trim_out_unlabelled_data()
+#labelled_features <- trim_out_unlabelled_data()
+# TODO: Fix illumina package
+labelled_features <- load("../labelled_features.RData")
 
 # Pull out only reduced features that are labelled (intersect of sets)
-reduced_gene_set <- intersect(row.names(reduced_features$TG_DRDC), 
-                              labelled_features$Genes$id)
-reduced_meth_set <- intersect(row.names(reduced_features$TS_DRDC), 
-                              row.names(labelled_features$MethylSites))
+reduced_gene_set  <- intersect(row.names(reduced_features$TG_DRDC), 
+                               labelled_features$Genes$id)
+reduced_meth_set  <- intersect(row.names(reduced_features$TS_DRDC), 
+                               row.names(labelled_features$MethylSites))
 
 # Subset expression and methylation data to reduced/labelled features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
@@ -66,7 +68,7 @@ wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
 row.names(wk.methy) <- subset(FullAnnot, 
                               FullAnnot$Name %in% row.names(wk.methy))$UCSC_RefGene_Name
 
-# First Analysis (Diagnostic samples only) ----
+# Second Analysis (Diagnostic samples v. Cured) ----
 
 # Find the sample values and patient numbers that have
 # diagnostic and cured status (n=22)
@@ -107,7 +109,7 @@ AbarLabel <- c(colnames(cbind(X1, X2)))
 K <- 2 # num folds in k-fold cross val
 CCcoef <- NULL # unweighted version of SmCCNet
 s1 <- 0.7; s2 <- 0.9 # feature sampling proportions 
-SubsamplingNum <- 500 # num of subsamples
+SubsamplingNum <- 2 # num of subsamples
 
 # Create sparsity penalty options.
 pen1 <- seq(.1, .9, by = .1) 
