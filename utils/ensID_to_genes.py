@@ -8,6 +8,7 @@ mg = mygene.MyGeneInfo()
 
 # read in csv and extract list of Ensembl ids
 target = input("File path to csv containing genes: ")
+output = input("Name for output file: ")
 genes = pandas.read_csv(str(target), header=0)
 ens_ids = genes.x.tolist()
 
@@ -22,5 +23,5 @@ pubGenes = pg.GeneSymbol.tolist()
 df = pandas.DataFrame(g_symbols)
 df["memberTCGA"] = np.where(df["symbol"].isin(pubGenes), "True", "False")
 
-df.to_csv("./ProblemGeneSymbols.csv", sep=',', index=False,
+df.to_csv("./" + output + ".csv", sep=',', index=False,
             columns=['query', 'symbol', 'name', 'memberTCGA'])
