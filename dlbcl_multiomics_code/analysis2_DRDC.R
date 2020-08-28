@@ -282,8 +282,8 @@ Ws <- getRobustPseudoWeights(X1, X2, Y, l1, l2, s1, s2,
                              SubsamplingNum = SubsamplingNum, CCcoef = CCcoef)
 
 # Remove unused large vars before next memory intensive step
-rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, cpm.rna_diagnostic,
-   X1, X2)
+rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, 
+   cpm.rna_diagnostic, X1, X2, Y, labelled_features)
 gc()
 
 # Get adjacency matrix (MEM INTENSIVE)
@@ -315,5 +315,6 @@ for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
                         multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = AbarLabel, SaveFile = filename)
+                        EdgeCut = edgeCut, FeatureLabel = AbarLabel, 
+                        SaveFile = filename)
 }

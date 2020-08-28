@@ -54,12 +54,13 @@ source("trim_out_unlabelled_data.R")
 reduced_features  <- diff_exp_dimreduction(1)
 
 # Pull out only labelled genes and methylsites
-labelled_features <- trim_out_unlabelled_data()
+#labelled_features <- trim_out_unlabelled_data()
+labelled_features <- load("../labelled_features.RData")
 
 # Pull out only reduced features that are labelled (intersect of sets)
-reduced_gene_set  <- intersect(row.names(reduced_features$TG_DRDC), 
+reduced_gene_set  <- intersect(row.names(reduced_features$TG_DRR), 
                                labelled_features$Genes$id)
-reduced_meth_set  <- intersect(row.names(reduced_features$TS_DRDC), 
+reduced_meth_set  <- intersect(row.names(reduced_features$TS_DRR), 
                                row.names(labelled_features$MethylSites))
 
 # Subset expression and methylation data to reduced features
@@ -113,7 +114,7 @@ c1 <- sqrt(p1 * s1) * P1P2[ , 1]; c1[c1] <- 1
 c2 <- sqrt(p2 * s2) * P1P2[ , 2]; c2[c2 < 1] <- 1
 
 # Based on prior knowledge we may assume that there are at least as many
-# genes as miRNAs in each network.
+# genes as methylsites in each network.
 # NOTE: This may not hold for current project. Check with Bo.
 P1P2 <- P1P2[which(c1>c2), ]
 
