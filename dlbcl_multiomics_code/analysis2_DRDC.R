@@ -52,7 +52,7 @@ reduced_features  <- diff_exp_dimreduction(2)
 # Pull out only labelled genes and methylsites
 #labelled_features <- trim_out_unlabelled_data()
 # TODO: Fix illumina package
-labelled_features <- load("../labelled_features.RData")
+load("../labelled_features.RData")
 
 # Pull out only reduced features that are labelled (intersect of sets)
 reduced_gene_set  <- intersect(row.names(reduced_features$TG_DRDC), 
@@ -63,10 +63,6 @@ reduced_meth_set  <- intersect(row.names(reduced_features$TS_DRDC),
 # Subset expression and methylation data to reduced/labelled features
 cpm.rna <- subset(cpm.rna, rownames(cpm.rna) %in% reduced_gene_set)
 wk.methy <- subset(wk.methy, rownames(wk.methy) %in% reduced_meth_set)
-
-# Add gene names to wk.methy
-row.names(wk.methy) <- subset(FullAnnot, 
-                              FullAnnot$Name %in% row.names(wk.methy))$UCSC_RefGene_Name
 
 # Second Analysis (Diagnostic samples v. Cured) ----
 
@@ -281,9 +277,13 @@ Ws <- getRobustPseudoWeights(X1, X2, Y, l1, l2, s1, s2,
                              NoTrait = FALSE, FilterByTrait = TRUE, 
                              SubsamplingNum = SubsamplingNum, CCcoef = CCcoef)
 
+# Calculate and save correlation matrix
+bigCor <- cor(cbind(X1, X2))
+save(bigCor, p1, file=paste0(CVDir, "A2"))
+
 # Remove unused large vars before next memory intensive step
 rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, 
-   cpm.rna_diagnostic, X1, X2, Y, labelled_features)
+   cpm.rna_diagnostic, X1, X2, Y, labelled_features, bigCor)
 gc()
 
 # Get adjacency matrix (MEM INTENSIVE)
@@ -291,30 +291,5 @@ Abar <- getAbar(Ws, FeatureLabel = AbarLabel)
 
 # Get multi-omics modules and plot subnetworks
 Modules <- getMultiOmicsModules(Abar, p1)
-save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeights.RData"))
+save(Ws, Abar, Modules, file = paste0(CVDir, "SmCCNetWeightsA2.RData"))
 
-# Cut out edges with weight less than edgeCut
-bigCor <- cor(cbind(X1, X2))
-edgeCut <- 0.4
-
-# Before producing nets, use wk.gene to
-# replace row/col names with Gene IDs
-if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
-  # There are ~556 NA values (and many other blank string values)
-  # Replace NA with "" values
-  wk.gene[which(is.na(wk.gene$gene)),]$gene <- ""
-  # If gene ID is empty string, use the Ensemble ID
-  wk.gene[which(wk.gene[,2] == ""),2] <- wk.gene[which(wk.gene[,2] == ""),1]
-  revised_labels <- dplyr::recode(
-    AbarLabel, 
-    !!!setNames(as.character(wk.gene$gene), wk.gene$id))
-}
-
-# Produce gene networks from adjacency network
-for(idx in 1:length(Modules)){
-  filename <- paste0(CVDir, "Net_", idx, ".pdf")
-  plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
-                        multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = AbarLabel, 
-                        SaveFile = filename)
-}
