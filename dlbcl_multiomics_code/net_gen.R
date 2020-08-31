@@ -2,7 +2,7 @@
 
 # Load in libraries
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
-source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/R/SmCCNetSource_forcelayout.R")
+source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/R/SmCCNetSource.R")
 source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/trim_out_unlabelled_data.R")
 
 # get the annotations and retrieve gene names
@@ -32,15 +32,16 @@ gene_labels   <- paste0("G: ", gene_labels$gene)
 AbarLabel <- c(testy, testy2)
 
 # Cut out edges with weight less than edgeCut
-edgeCut <- 0.4
+edgeCut <- 0.021
 
 # Produce gene networks from adjacency network
 for(idx in 1:length(Modules)){
   filename <- paste0(CVDir, "Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
                         multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = AbarLabel, 
-                        SaveFile = filename)
+                        EdgeCut = edgeCut, FeatureLabel = AbarLabel,
+                        VertexLabelCex = 0.5, NetLayout = "lgl", 
+                        VertexSize = 0.2, SaveFile = filename)
 }
 
 plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
