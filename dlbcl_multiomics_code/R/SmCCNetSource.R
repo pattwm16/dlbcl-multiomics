@@ -387,7 +387,7 @@ plotMultiOmicsNetwork <- function(Abar, CorrMatrix, multiOmicsModule,
 
 
         if(!is.null(SaveFile)){
-            grDevices::pdf(SaveFile)
+            grDevices::cairo_pdf(SaveFile, width = 15, height = 15)
             graphics::par(bg = "white")
             graphics::plot(net, vertex.color = vcol, vertex.shape = vshape,
                  vertex.label.cex = VertexLabelCex, layout = l,

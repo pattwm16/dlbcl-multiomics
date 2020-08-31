@@ -8,7 +8,7 @@ see_viz <- FALSE
 diff_exp_dimreduction <- function(analysis){
   
   # Set cutoff values for pval
-  DRR_pval_thresh <- 0.05
+  DRR_pval_thresh  <- 0.05
   DRDC_pval_thresh <- 0.02
   
   # Import libraries
@@ -69,8 +69,10 @@ diff_exp_dimreduction <- function(analysis){
   fitDRDC <- eBayes(fitDRDC)
   
   # check the top methylation sites using topTable()
-  top_sites_DRDC <- topTable(fitDRDC, coef = 2, p.value = DRDC_pval_thresh, 
+  top_sites_DRDC <- topTable(fitDRDC, coef = 2, p.value = DRDC_pval_thresh,
                              number = Inf)
+  
+  
   
   # Return only the differential expresion data for the analysis
   # 1: DRvR analysis
