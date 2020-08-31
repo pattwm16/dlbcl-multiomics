@@ -7,6 +7,10 @@ see_viz <- FALSE
 
 diff_exp_dimreduction <- function(analysis){
   
+  # Set cutoff values for pval
+  DRR_pval_thresh <- 0.05
+  DRDC_pval_thresh <- 0.02
+  
   # Import libraries
   library(limma)
   
@@ -24,7 +28,7 @@ diff_exp_dimreduction <- function(analysis){
   # Default for topTable is Benjamini-Hochberg
   top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf,
                             adjust.method = "BY")
-  top_genes_DRR <- subset(top_genes_DRR, P.Value <= 0.05)
+  top_genes_DRR <- subset(top_genes_DRR, P.Value <= DRR_pval_thresh)
   
   ## For DR vs. DC
   DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
@@ -37,7 +41,7 @@ diff_exp_dimreduction <- function(analysis){
   
   top_genes_DRDC <- topTable(fitDRDC, coef = 2, number = Inf,
                              adjust.method="BH")
-  top_genes_DRDC <- subset(top_genes_DRDC, P.Value <= 0.05)
+  top_genes_DRDC <- subset(top_genes_DRDC, P.Value <= DRDC_pval_thresh)
   
   
   # Perform differential methylation analysis ----
@@ -52,7 +56,7 @@ diff_exp_dimreduction <- function(analysis){
   
   # check the top methylation sites using topTable()
   top_sites_DRR <- topTable(fitDRR, coef = 2, number = Inf)
-  top_sites_DRR <- subset(top_sites_DRR, P.Value <= 0.05)
+  top_sites_DRR <- subset(top_sites_DRR, P.Value <= DRR_pval_thresh)
   
   
   ## For DR vs. DC
@@ -65,7 +69,8 @@ diff_exp_dimreduction <- function(analysis){
   fitDRDC <- eBayes(fitDRDC)
   
   # check the top methylation sites using topTable()
-  top_sites_DRDC <- topTable(fitDRDC, coef = 2, p.value = 0.05, number = Inf)
+  top_sites_DRDC <- topTable(fitDRDC, coef = 2, p.value = DRDC_pval_thresh, 
+                             number = Inf)
   
   # Return only the differential expresion data for the analysis
   # 1: DRvR analysis
