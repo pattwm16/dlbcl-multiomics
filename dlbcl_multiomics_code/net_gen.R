@@ -26,8 +26,10 @@ AnnotMethylSites <- subset(FullAnnot, FullAnnot$Name %in% AbarLabel)
 gene_labels <- subset(wk.gene, wk.gene$id %in% AbarLabel)
 
 # create new AbarLabel
-testy = paste0("MS: ", AnnotMethylSites$UCSC_RefGene_Name)
-AbarLabel1 <- c(testy, gene_labels$gene)
+methyl_labels <- paste0("MS: ", AnnotMethylSites$UCSC_RefGene_Name)
+gene_labels   <- paste0("G: ", gene_labels$gene)
+
+AbarLabel <- c(testy, testy2)
 
 # Cut out edges with weight less than edgeCut
 edgeCut <- 0.4
@@ -43,5 +45,6 @@ for(idx in 1:length(Modules)){
 
 plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
                       multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1,
-                      EdgeCut = edgeCut, FeatureLabel = AbarLabel1,
-                      VertexLabelCex = 0.2)
+                      EdgeCut = 0.021, FeatureLabel = AbarLabel1,
+                      VertexLabelCex = 0.5, AddCorrSign = TRUE,
+                      NetLayout = "lgl", VertexSize = 0.2)
