@@ -2,34 +2,35 @@
 
 # Load in libraries
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
+source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/R/SmCCNetSource_forcelayout.R")
+source("C:/Users/patterw/Documents/GitHub/dlbcl-multiomics/dlbcl_multiomics_code/trim_out_unlabelled_data.R")
 
-source("R/SmCCNetSource_forcelayout.R")
+# get the annotations and retrieve gene names
+load("C:/Users/patterw/Box/data/DLBCL_multi_omics.rdata")
+labelled_data <- trim_out_unlabelled_data()
+FullAnnot = getAnnotation(IlluminaHumanMethylationEPICanno.ilm10b4.hg19) 
+FullAnnot = FullAnnot[,c("Name","UCSC_RefGene_Name")]
 
+# Set working directory and load in analysis data
+setwd("C:/Users/patterw/Documents/Summer Research/A1_data")
+load("SmCCNetWeightsA1.RData")
+load("CorrMatrixA1.RData")
 
-# Load in data
-load("SmCCNetWeights.RData")
-load("CorrMatrix.RData")
+# create AbarLabel object
+AbarLabel <- c(colnames(Abar))
+
+# subset methylsites in AbarLabel
+AnnotMethylSites <- subset(FullAnnot, FullAnnot$Name %in% AbarLabel)
+
+# subset genes in AbarLabel
+gene_labels <- subset(wk.gene, wk.gene$id %in% AbarLabel)
+
+# create new AbarLabel
+testy = paste0("MS: ", AnnotMethylSites$UCSC_RefGene_Name)
+AbarLabel1 <- c(testy, gene_labels$gene)
 
 # Cut out edges with weight less than edgeCut
 edgeCut <- 0.4
-
-# Add gene names to wk.methy
-# TODO: Refactor to work with AbarLabel
-row.names(wk.methy) <- subset(FullAnnot, 
-                              FullAnnot$Name %in% row.names(wk.methy))$UCSC_RefGene_Name
-
-# Before producing nets, use wk.gene to
-# replace row/col names with Gene IDs
-if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
-  # There are ~556 NA values (and many other blank string values)
-  # Replace NA with "" values
-  wk.gene[which(is.na(wk.gene$gene)),]$gene <- ""
-  # If gene ID is empty string, use the Ensemble ID
-  wk.gene[which(wk.gene[,2] == ""),2] <- wk.gene[which(wk.gene[,2] == ""),1]
-  revised_labels <- dplyr::recode(
-    AbarLabel, 
-    !!!setNames(as.character(wk.gene$gene), wk.gene$id))
-}
 
 # Produce gene networks from adjacency network
 for(idx in 1:length(Modules)){
@@ -40,32 +41,7 @@ for(idx in 1:length(Modules)){
                         SaveFile = filename)
 }
 
-
-# TRASH ----
-# Before producing nets, use wk.gene to
-# replace row/col names with Gene IDs
-if(length(setdiff(colnames(Abar), rownames(Abar))) == 0){
-  # There are ~556 NA values (and many other blank string values)
-  # TODO: Ask Bo about difference between NA vs. "" values in wk.gene
-  
-  # Replace NA with "" values
-  wk.gene[which(is.na(wk.gene$gene)),]$gene <- ""
-  # If gene ID is empty string, use the Ensemble ID
-  wk.gene[which(wk.gene[,2] == ""),2] <- wk.gene[which(wk.gene[,2] == ""),1]
-  revised_labels <- dplyr::recode(
-    AbarLabel, 
-    !!!setNames(as.character(wk.gene$gene), wk.gene$id))
-}
-
-# Produce gene networks from adjacency network
-for(idx in 1:length(Modules)){
-  filename <- paste0(CVDir, "Net_", idx, ".pdf")
-  plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
-                        multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
-                        EdgeCut = edgeCut, FeatureLabel = revised_labels, SaveFile = filename)
-}
-
 plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor,
                       multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1,
-                      EdgeCut = edgeCut, FeatureLabel = revised_labels,
+                      EdgeCut = edgeCut, FeatureLabel = AbarLabel1,
                       VertexLabelCex = 0.2)

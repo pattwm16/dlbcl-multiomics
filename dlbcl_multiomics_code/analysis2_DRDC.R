@@ -279,12 +279,12 @@ Ws <- getRobustPseudoWeights(X1, X2, Y, l1, l2, s1, s2,
 
 # Calculate and save correlation matrix
 bigCor <- cor(cbind(X1, X2))
-save(bigCor, p1, file=paste0(CVDir, "A2"))
+save(bigCor, p1, file=paste0(CVDir, "CorrMatrixA2.RData"))
 
 # Remove unused large vars before next memory intensive step
 rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna, 
    cpm.rna_diagnostic, X1, X2, Y, labelled_features, bigCor)
-gc()
+gc(TRUE)
 
 # Get adjacency matrix (MEM INTENSIVE)
 Abar <- getAbar(Ws, FeatureLabel = AbarLabel)

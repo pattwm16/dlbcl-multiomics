@@ -397,7 +397,7 @@ plotMultiOmicsNetwork <- function(Abar, CorrMatrix, multiOmicsModule,
             graphics::title(PlotTitle)
             grDevices::dev.off()
         }else{
-            net.graphopt <- layout_with_graphopt(net, charge = 0.009, mass = 50, spring.length = E(net)$weight) 
+            net.graphopt <-  igraph::layout_with_graphopt(net, charge = 0.500, mass = 30) 
             graphics::plot(net, vertex.color = vcol, vertex.shape = vshape,
                  vertex.label.cex = VertexLabelCex, layout = net.graphopt,
                  vertex.size = VertexSize, vertex.label = newM.node,
