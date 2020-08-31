@@ -367,7 +367,7 @@ plotMultiOmicsNetwork <- function(Abar, CorrMatrix, multiOmicsModule,
 
 
         # Define edge colors.
-        ecol <- rep("gray80", igraph::ecount(net))
+        ecol <- rep("green", igraph::ecount(net))
         ew <- abs(igraph::edge.attributes(net)$weight) * 5
         ecol[which(igraph::edge.attributes(net)$weight < 0)] <- "red"
 
