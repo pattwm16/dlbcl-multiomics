@@ -1,5 +1,22 @@
 # Net Generator
 
+# Helper Functions ----
+# Function: labelify
+# Consumes a list of gene names (separated by ;), returns unique gene names
+# with repeats spliced out (e.g. ["ZCCHC7", "ZCCHC7", "ZCCHC7"] returns 
+# "ZCCHC7", but ["MIR219A2", "MIR1268A"] returns "MIR219A2;MIR1268A").
+labelify <- function(names_list){
+  lst <- c()
+  for(elem in names_list){
+    lst <- append(lst, paste(unique(unlist(strsplit(elem, ";"))), 
+                             collapse = ";"))
+  }
+  return(lst)
+}
+
+# Analysis body ----
+
+# Set which analysis is being performed
 anal <- 2
 
 # Load in libraries
@@ -34,6 +51,7 @@ AbarLabel <- c(colnames(Abar))
 
 # subset methylsites in AbarLabel
 AnnotMethylSites <- subset(FullAnnot, FullAnnot$Name %in% AbarLabel)
+AnnotMethylSites$UCSC_RefGene_Name <- labelify(AnnotMethylSites$UCSC_RefGene_Name)
 
 # subset genes in AbarLabel
 gene_labels <- subset(wk.gene, wk.gene$id %in% AbarLabel)
@@ -45,7 +63,12 @@ gene_labels   <- paste0("G: ", gene_labels$gene)
 AbarLabel <- c(methyl_labels, gene_labels)
 
 # Cut out edges with weight less than edgeCut
-edgeCut <- 0.21
+if(anal == 1){
+  edgeCut <- 0.021
+}else if(anal == 2){
+  edgeCut <- 0.21
+}
+
 
 # Produce gene networks from adjacency network
 for(idx in 1:length(Modules)){
@@ -58,19 +81,36 @@ for(idx in 1:length(Modules)){
 }
 
 # get list of genes in network
+# TODO: Figure out why some genes shown in GeneList are not represented in
+#       the networks produced by plotMultiomicsNetwork()
 for(idx in 1:length(Modules)){
+  # Copied next 5 lines from SmCCNetSource.R
   grp <- Modules[[idx]]
   grp.memb <- colnames(Abar)[grp]
   M.node <- grp.memb
   
   M <- as.matrix(Abar[M.node, M.node])
   M <- M * sign(bigCor[M.node, M.node])
-  which(abs(M) >= 0.88, arr.ind = TRUE)
+  
+  # Select the unique rows (since matrix is symmetric wrt names)
   net_verts <- unique(rownames(which(abs(M) >= edgeCut, arr.ind = TRUE)))
   
+  # Select gene & methyl site names based on ids in net_verts
   genes_in_net <- subset(wk.gene$gene, wk.gene$id %in% net_verts)
-  methylsites_in_net <- subset(FullAnnot$UCSC_RefGene_Name, 
-                               FullAnnot$Name %in% net_verts)
-  verts_list <- c(genes_in_net, methylsites_in_net)
-  write.csv("Net_", idx, ".csv")
+  methylsites_in_net <- subset(AnnotMethylSites$UCSC_RefGene_Name, 
+                               AnnotMethylSites$Name %in% net_verts)
+  
+  # Create a dataframe of these names and tidy
+  verts_list <- as.data.frame(c(genes_in_net, methylsites_in_net))
+  colnames(verts_list) <- c("GeneNames")
+  
+  # Check membership of these 
+  TCGA <- read.csv("C:/Users/patterw/Documents/Summer Research/A1_data/publishedGenes.csv")
+  verts_list$inTCGA <- verts_list$GeneNames %in% TCGA[,]
+  
+  # If not an empty graph, export list of genes as CSV
+  if(nrow(verts_list >= 1)){
+    write.csv(x = verts_list, 
+              file = paste0("Net_", idx, "GeneList.csv")) 
+  }
 }
