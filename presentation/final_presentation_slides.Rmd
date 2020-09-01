@@ -1,10 +1,15 @@
 ---
-title: "Elucidating gene networks in resistance diffuse large B-cell lymphoma"
-author: "Will Patterson"
+title: "Elucidating gene networks precipitating relapse in CAR T-Cell treated diffuse large B-cell lymphoma"
+subtitle: "A case for multiple CCA and heirarchical tree trimming"
+author: 
+  - "Will Patterson"
+  - "Bo Hu (Advisor)"
 header-includes:
   - \usepackage{mathtools}
   - \usepackage{amssymb}
   - \usepackage{amsmath}
+  - \AtBeginDocument{\title[DLBCL Multiomics]{Elucidating gene networks precipitating relapse in CAR T-Cell treated diffuse large B-cell lymphoma}}
+  - \titlegraphic{\includegraphics[width=0.3\paperwidth]{\string images/cclogo.jpg}} 
 date: "8/28/2020"
 output: 
   beamer_presentation: 
@@ -16,38 +21,45 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Jargon: An introduction
+## Outline
 
-- **Canonical variate**: linear combinations of variables
-- **Canonical variate pair**: two canonical variates (one from each set) with some non-zero correlation
-- **Canonical correlation**: the correlation between canonical variate pairs
+**Hypothesis**: Integration of multi-omics signals will elucidate gene networks involved in DLBCL relapse after CAR T-cell therapy.
 
-## Canonical Correlation Analysis: Definition
+
+1. **What**: Diffuse Large B-Cell Lymphoma
+
+2. **Why**: Approximately half of patients with DLBCL treated with CAR T-cells will relapse
+
+3. **How**: Multi-omics integration using sparse multiple cannonical correlation analysis
+
+## What: Diffuse Large B-Cell Lymphoma
+
+```{r, fig.align='center', out.width="45%", fig.cap = "Micrograph of DLBCL (Field stain)"}
+knitr::include_graphics("images/dlbcl_stain.jpg")
+```
+
+- Most common non-Hodgkin lymphoma (5.6 per 100,000 persons per year), arises from mature B lymphocytes
+
+- Average 5-year relative survival rate of 63\% (72\% for all NHL)
+
+- **Treatment:** R-CHOP/EPOCH $\rightarrow$ salvage/HCT $\rightarrow$ CAR T-cell
+
+
+## Multiple Canonical Correlation Analysis: Definition
 
 **Canonical Correlation Analysis (CCA)** finds the relationship between two sets of variables by finding the maximally correlated linear combinations of variables.
 
-## Canonical Correlation Analysis: Nitty Gritty
+**Given**: $K$ sets of observations on same $n$ observations, $\textbf{X}_1,...,\textbf{X}_K$ of dimensions $n \times p_k$, all standardized to mean zero and SD of one
 
-**Given**: two sets of observations on same $n$ observations, $\textbf{X}_1$ and $\textbf{X}_2$ of dimensions $n \times p_1$ and $n \times p_2$, standardized to mean zero and SD of one
+**Find**: Weights $\textbf{w}_1,...,\textbf{w}_k$, where $\textbf{w}_k \in \mathbb{R}^{p_k}$, such that the objective function below is maximized
 
-**Find**: Weights $\textbf{w}_1 \in \mathbb{R}^{p_1}$ and $\textbf{w}_2 \in \mathbb{R}^{p_2}$ the objective function below is maximized
-
-### CCA objective function
-\begin{equation} \label{eq:penalized_cca}
-    \text{maximize}_{w_1, w_2} \textbf{w}_1^T\textbf{X}_1^T\textbf{X}_2\textbf{w}_2 \notag \end{equation} 
-\begin{equation} \text{subject to }||\textbf{w}_1||^2 \leq 1,||\textbf{w}_2||^2 \leq 1, P_1(\textbf{w}_1) \leq c_1, P_2(\textbf{w}_2) \leq c_2 \notag
-\end{equation} 
-\begin{center}
-(where $P_1$ and $P_2$ are penalty functions, usually lasso, $L_1$)
-\end{center}
-## Sparse **Multiple** CCA
-
-**Sparse multiple CCA (or sparse mCCA)** is an extensible form of sparse CCA, generalizable for any $K$ data sets $\textbf{X}_1,...,\textbf{X}_K$, where data set $k$ contains $p_k$ features. The objective function then takes the form:
-
-### Sparse mCCA objective function
+### Multiple CCA objective function
 \begin{equation} \label{eq:penalized_smcca}
     \text{maximize}_{\textbf{w}_1,...,\textbf{w}_K} \sum_{i<j} \textbf{w}_i^T\textbf{X}_i^T\textbf{X}_j\textbf{w}_j \text{ subject to }||\textbf{w}_i||^2 \leq 1, P_i(\textbf{w}_i) \leq c_i, \forall i \notag
 \end{equation} 
+\begin{center}
+(where $P_i$ is the lasso penalty for $i^{th}$ set)
+\end{center}
 
 ## Extension of sparse mCCA to binary outcomes
 
