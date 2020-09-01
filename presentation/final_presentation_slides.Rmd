@@ -47,7 +47,7 @@ knitr::include_graphics("images/dlbcl_stain.jpg")
 
 ## Multiple Canonical Correlation Analysis: Definition
 
-**Canonical Correlation Analysis (CCA)** finds the relationship between two sets of variables by finding the maximally correlated linear combinations of variables.
+**Canonical Correlation Analysis (CCA)** finds the relationship between sets of variables by finding their maximally correlated linear combinations.
 
 **Given**: $K$ sets of observations on same $n$ observations, $\textbf{X}_1,...,\textbf{X}_K$ of dimensions $n \times p_k$, all standardized to mean zero and SD of one
 
