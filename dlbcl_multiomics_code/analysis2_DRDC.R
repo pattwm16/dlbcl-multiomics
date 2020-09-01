@@ -286,7 +286,7 @@ rm(wk.methy, wk.methy_diagnostic, wk.gene, wk.pheno, cpm.rna,
    cpm.rna_diagnostic, X1, X2, Y, labelled_features, bigCor)
 gc(TRUE)
 
-# Get adjacency matrix (MEM INTENSIVE)
+# Get similarity matrix (MEM INTENSIVE)
 Abar <- getAbar(Ws, FeatureLabel = AbarLabel)
 
 # Get multi-omics modules and plot subnetworks

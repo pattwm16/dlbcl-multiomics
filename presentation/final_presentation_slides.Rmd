@@ -4,6 +4,7 @@ subtitle: "A case for multiple CCA and heirarchical tree trimming"
 author: 
   - "Will Patterson"
   - "Bo Hu (Advisor)"
+institute: "Cleveland Clinic Lerner College of Medicine"
 header-includes:
   - \usepackage{mathtools}
   - \usepackage{amssymb}
@@ -14,6 +15,7 @@ date: "8/28/2020"
 output: 
   beamer_presentation: 
     fonttheme: professionalfonts
+    keep_tex: yes
     theme: Madrid
 ---
 
@@ -24,7 +26,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Outline
 
 **Hypothesis**: Integration of multi-omics signals will elucidate gene networks involved in DLBCL relapse after CAR T-cell therapy.
-
 
 1. **What**: Diffuse Large B-Cell Lymphoma
 
@@ -44,7 +45,6 @@ knitr::include_graphics("images/dlbcl_stain.jpg")
 
 - **Treatment:** R-CHOP/EPOCH $\rightarrow$ salvage/HCT $\rightarrow$ CAR T-cell
 
-
 ## Multiple Canonical Correlation Analysis: Definition
 
 **Canonical Correlation Analysis (CCA)** finds the relationship between sets of variables by finding their maximally correlated linear combinations.
@@ -58,7 +58,7 @@ knitr::include_graphics("images/dlbcl_stain.jpg")
     \text{maximize}_{\textbf{w}_1,...,\textbf{w}_K} \sum_{i<j} \textbf{w}_i^T\textbf{X}_i^T\textbf{X}_j\textbf{w}_j \text{ subject to }||\textbf{w}_i||^2 \leq 1, P_i(\textbf{w}_i) \leq c_i, \forall i \notag
 \end{equation} 
 \begin{center}
-(where $P_i$ is the lasso penalty for $i^{th}$ set)
+(where $P_i$ is the $L_1$ penalty for $i^{th}$ set)
 \end{center}
 
 ## Extension of sparse mCCA to binary outcomes
@@ -72,5 +72,17 @@ Witten and Tibshirani (2009) suggest an extension of sparse mCCA that allows for
     \textbf{w}_2^T\textbf{X}_2^T\textbf{y}\textbf{w}_3 \notag \end{equation} 
 \begin{equation} \text{subject to }||\textbf{w}_i||^2 \leq 1, P_i(\textbf{w}_i) \leq c_i, \forall i \notag
 \end{equation} 
+
+## Extracting gene networks from multiple CCA
+
+Three step process for gene network extraction:
+
+1. Compute the similarity matrix based on the outer products of absolute canonical correlation weights.
+
+2. Apply hierarchical tree cutting to the similarity matrix and extract modules that contain all -omics data types.
+
+3. Visualize networks.
+
+## Curse of dimensionality
 
 

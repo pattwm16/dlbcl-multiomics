@@ -115,6 +115,7 @@ diff_exp_dimreduction <- function(analysis){
     alpha_counts_genes <- rbind(counts_geneDRR, counts_geneDRDC)
     alpha_counts_sites <- rbind(counts_siteDRR, counts_siteDRDC)
     
+    library(ggplot2)
     ggplot(alpha_counts_genes, aes(x=as.character(Alpha), y=Counts, fill=Comparison)) +
       facet_grid(cols=vars(Comparison)) +
       geom_col() +
