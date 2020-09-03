@@ -223,7 +223,7 @@ b <- list(
   showticklabels = TRUE,
   tickfont = f2
 )
-hmelt <- melt(T12[ , -3], id.vars = c("l1", "l2"))
+hmelt <- melt(T12[ , -4], id.vars = c("l1", "l2"))
 contourPlot <- plot_ly(hmelt, x = ~l1, y = ~l2, z = ~value, type = "contour") %>%
   layout(xaxis = a, yaxis = b, showlegend = TRUE, legend = f1)  
 export(contourPlot, file = paste0(CVDir, "TotalPredictionError.pdf"))
