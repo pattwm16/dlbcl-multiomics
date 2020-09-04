@@ -75,6 +75,12 @@
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
 \newif\ifbibliography
+\usepackage{longtable,booktabs}
+\usepackage{caption}
+% These lines are needed to make table captions work with longtable:
+\makeatletter
+\def\fnum@table{\tablename~\thetable}
+\makeatother
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -88,6 +94,7 @@
 \usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{graphicx}
 \AtBeginDocument{\title[DLBCL Multiomics]{Elucidating gene networks precipitating relapse in CAR T-Cell treated diffuse large B-cell lymphoma}}
 \titlegraphic{\includegraphics[width=0.3\paperwidth]{\string images/cclogo.jpg}}
 
@@ -96,8 +103,6 @@ diffuse large B-cell lymphoma}
 \providecommand{\subtitle}[1]{}
 \subtitle{A case for multiple CCA and heirarchical tree trimming}
 \author{Will Patterson \and Bo Hu (Advisor)}
-\providecommand{\institute}[1]{}
-\institute{Cleveland Clinic Lerner College of Medicine}
 \date{8/28/2020}
 
 \begin{document}
@@ -215,8 +220,79 @@ Three step process for gene network extraction:
 
 \end{frame}
 
-\begin{frame}{Curse of dimensionality}
-\protect\hypertarget{curse-of-dimensionality}{}
+\begin{frame}{Diagnostic Samples Only: Gene Expression}
+\protect\hypertarget{diagnostic-samples-only-gene-expression}{}
+
+\includegraphics[height=0.85\textheight]{final_presentation_slides_files/figure-beamer/DRR_gene_volcano-1}
+
+\end{frame}
+
+\begin{frame}{Diagnostic Samples Only: Methylation Sites}
+\protect\hypertarget{diagnostic-samples-only-methylation-sites}{}
+
+\includegraphics[height=0.85\textheight]{final_presentation_slides_files/figure-beamer/DRR_methyl_volcano-1}
+
+\end{frame}
+
+\begin{frame}{Diagnostic Samples Only: Gene Network Analysis}
+\protect\hypertarget{diagnostic-samples-only-gene-network-analysis}{}
+
+\begin{center}\includegraphics[width=0.7\linewidth]{images/DRRNet1} \end{center}
+
+\end{frame}
+
+\begin{frame}{Diagnostic vs.~Relapsed Patients: Gene Expression}
+\protect\hypertarget{diagnostic-vs.relapsed-patients-gene-expression}{}
+
+\includegraphics[height=0.85\textheight]{final_presentation_slides_files/figure-beamer/DRDC_gene_volcano-1}
+
+\end{frame}
+
+\begin{frame}{Diagnostic vs.~Relapsed Patients: Methylation Sites}
+\protect\hypertarget{diagnostic-vs.relapsed-patients-methylation-sites}{}
+
+\includegraphics[height=0.85\textheight]{final_presentation_slides_files/figure-beamer/DRDC_methyl_volcano-1}
+
+\end{frame}
+
+\begin{frame}{Diagnostic vs.~Relapsed Patients: Gene Network Analysis}
+\protect\hypertarget{diagnostic-vs.relapsed-patients-gene-network-analysis}{}
+
+\begin{center}\includegraphics[width=0.7\linewidth]{images/DRDCNet1} \end{center}
+
+\end{frame}
+
+\begin{frame}{SmCCNet identifies key DLBCL genes from literature}
+\protect\hypertarget{smccnet-identifies-key-dlbcl-genes-from-literature}{}
+
+{[}INSERT EXAMPLES OF GENES{]}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+Gene & Function & OMIM & Citation\tabularnewline
+\midrule
+\endhead
+CREBBP & transcription factor & 600140 &
+\href{https://www.nature.com/articles/nature09730}{Pasqualucci et al.
+(2011)}\tabularnewline
+TNK1 & tyrosine kinase & 608076 &
+\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2917161/}{May et al.
+(2010)}\tabularnewline
+BCL3 & NF-\(\kappa\)B inhibitor & 109560 &
+\href{https://pubmed.ncbi.nlm.nih.gov/21752100/}{Ibrahim et al.
+(2011)}\tabularnewline
+ZCCHC7 & TRAMP component & NA &
+\href{https://pubmed.ncbi.nlm.nih.gov/30348671/}{Chong et al.
+(2018)}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{frame}
+
+\begin{frame}{Conclusions}
+\protect\hypertarget{conclusions}{}
+
+{[}INSERT CONCLUSIONS HERE{]}
 
 \end{frame}
 

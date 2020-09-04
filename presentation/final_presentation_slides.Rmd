@@ -4,11 +4,11 @@ subtitle: "A case for multiple CCA and heirarchical tree trimming"
 author: 
   - "Will Patterson"
   - "Bo Hu (Advisor)"
-institute: "Cleveland Clinic Lerner College of Medicine"
 header-includes:
   - \usepackage{mathtools}
   - \usepackage{amssymb}
   - \usepackage{amsmath}
+  - \usepackage{graphicx}
   - \AtBeginDocument{\title[DLBCL Multiomics]{Elucidating gene networks precipitating relapse in CAR T-Cell treated diffuse large B-cell lymphoma}}
   - \titlegraphic{\includegraphics[width=0.3\paperwidth]{\string images/cclogo.jpg}} 
 date: "8/28/2020"
@@ -83,6 +83,126 @@ Three step process for gene network extraction:
 
 3. Visualize networks.
 
-## Curse of dimensionality
+## Diagnostic Samples Only: Gene Expression
+
+```{r, DRR_gene_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
+load("~/Box/data/DLBCL_multi_omics.rdata")
+
+# Generate volcano plots
+
+library(EnhancedVolcano)
+library(limma)
+
+DRR <- which(wk.pheno$Status %in% c("Diagnostic","Relapsed"))
+datDRR <- wk.pheno[DRR, ]
+rnaDRR <- cpm.rna[ , DRR]
+
+design <- model.matrix(~ Status + Patient, data = datDRR)
+fitDRR <- lmFit(rnaDRR, design = design)
+fitDRR <- eBayes(fitDRR)
+
+# check the top genes using topTable()
+# Default for topTable is Benjamini-Hochberg
+top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf,
+                          adjust.method = "BH")
+
+EnhancedVolcano(top_genes_DRR, 
+                lab = rownames(top_genes_DRR), 
+                x = "logFC", 
+                y = "P.Value",
+                title = NULL,
+                subtitle = NULL)
+```
 
 
+## Diagnostic Samples Only: Methylation Sites
+
+```{r, DRR_methyl_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
+DRR <- which(wk.pheno$Status %in% c("Diagnostic","Relapsed"))
+datDRR <- wk.pheno[DRR, ]
+rnaDRR <- wk.methy[ , DRR]
+
+design <- model.matrix(~ Status + Patient, data = datDRR)
+fitDRR <- lmFit(rnaDRR, design = design)
+fitDRR <- eBayes(fitDRR)
+
+# check the top methylation sites using topTable()
+top_sites_DRR <- topTable(fitDRR, coef = 2, number = Inf)
+EnhancedVolcano(top_sites_DRR, 
+                lab = rownames(top_sites_DRR), 
+                x = "logFC", 
+                y = "P.Value",
+                title = NULL,
+                subtitle = NULL)
+```
+
+
+## Diagnostic Samples Only: Gene Network Analysis
+
+```{r, DRR_genenet, fig.align='center', out.width="70%"}
+knitr::include_graphics("images/DRRNet1.png")
+```
+
+## Diagnostic vs. Relapsed Patients: Gene Expression
+```{r, DRDC_gene_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
+DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
+datDRDC <- wk.pheno[DRDC, ]
+rnaDRDC <- cpm.rna[ , DRDC]
+
+design <- model.matrix(~ Status, data = datDRDC) # no patient here since these are independent samples
+fitDRDC <- lmFit(rnaDRDC, design = design)
+fitDRDC <- eBayes(fitDRDC)
+
+top_genes_DRDC <- topTable(fitDRDC, coef = 2, number = Inf,
+                           adjust.method="BH")
+EnhancedVolcano(top_genes_DRDC, 
+                lab = rownames(top_genes_DRDC), 
+                x = "logFC", 
+                y = "P.Value",
+                title = NULL,
+                subtitle = NULL)
+```
+
+## Diagnostic vs. Relapsed Patients: Methylation Sites
+
+```{r, message=FALSE, dev='png', DRDC_methyl_volcano, warning=FALSE, out.height="85%", cache=TRUE}
+DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
+datDRDC <- wk.pheno[DRDC, ]
+rnaDRDC <- wk.methy[ , DRDC]
+
+design <- model.matrix(~ Status, data = datDRDC) # no patient here since these are independent samples
+fitDRDC <- lmFit(rnaDRDC, design = design)
+fitDRDC <- eBayes(fitDRDC)
+
+# check the top methylation sites using topTable()
+top_sites_DRDC <- topTable(fitDRDC, coef = 2, number = Inf)
+EnhancedVolcano(top_sites_DRDC, 
+                lab = rownames(top_sites_DRDC), 
+                x = "logFC", 
+                y = "P.Value",
+                title = NULL,
+                subtitle = NULL,
+                selectLab = "")
+```
+
+
+## Diagnostic vs. Relapsed Patients: Gene Network Analysis
+
+```{r, DRDC_genenet, fig.align='center', out.width="70%"}
+knitr::include_graphics("images/DRDCNet1.png")
+```
+
+## SmCCNet identifies key DLBCL genes from literature
+
+[INSERT EXAMPLES OF GENES]
+
+| Gene | Function | OMIM | Citation |
+|---------------|-------------|------|---------|
+| CREBBP | transcription factor  | 600140 | [Pasqualucci et al. (2011)](https://www.nature.com/articles/nature09730) |
+| TNK1 | tyrosine kinase | 608076 | [May et al. (2010)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2917161/) |
+| BCL3 | NF-$\kappa$B inhibitor | 109560 | [Ibrahim et al. (2011)](https://pubmed.ncbi.nlm.nih.gov/21752100/) |
+| ZCCHC7 | TRAMP component | NA | [Chong et al. (2018)](https://pubmed.ncbi.nlm.nih.gov/30348671/) |
+
+## Conclusions
+
+[INSERT CONCLUSIONS HERE]
