@@ -17,7 +17,7 @@ labelify <- function(names_list){
 # Analysis body ----
 
 # Set which analysis is being performed
-anal <- 2
+anal <- 1
 
 # Load in libraries
 library(IlluminaHumanMethylationEPICanno.ilm10b4.hg19)
@@ -74,7 +74,7 @@ if(anal == 1){
 for(idx in 1:length(Modules)){
   filename <- paste0("Net_", idx, ".pdf")
   plotMultiOmicsNetwork(Abar = Abar, CorrMatrix = bigCor, 
-                        multiOmicsModule = Modules, ModuleIdx = idx, P1 = p1, 
+                        multiOmicsModule = Modules, ModuleIdx = 1, P1 = p1, 
                         EdgeCut = edgeCut, FeatureLabel = AbarLabel,
                         VertexLabelCex = 0.5, NetLayout = "lgl", 
                         VertexSize = 0.2, SaveFile = filename)

@@ -16,10 +16,12 @@ fitDRR <- eBayes(fitDRR)
 top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf,
                           adjust.method = "BH")
 
-EnhancedVolcano(top_genes_DRR, 
+q1 <- EnhancedVolcano(top_genes_DRR, 
                 lab = rownames(top_genes_DRR), 
                 x = "logFC", 
-                y = "P.Value")
+                y = "P.Value",
+                title = NULL,
+                subtitle = "Gene Expression")
 
 DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
 datDRDC <- wk.pheno[DRDC, ]
@@ -31,10 +33,12 @@ fitDRDC <- eBayes(fitDRDC)
 
 top_genes_DRDC <- topTable(fitDRDC, coef = 2, number = Inf,
                            adjust.method="BH")
-EnhancedVolcano(top_genes_DRDC, 
+p1 <- EnhancedVolcano(top_genes_DRDC, 
                 lab = rownames(top_genes_DRDC), 
                 x = "logFC", 
-                y = "P.Value")
+                y = "P.Value",
+                title = NULL,
+                subtitle = "Gene Expression")
 
 ### Methylation Sites -----
 DRR <- which(wk.pheno$Status %in% c("Diagnostic","Relapsed"))
@@ -47,10 +51,12 @@ fitDRR <- eBayes(fitDRR)
 
 # check the top methylation sites using topTable()
 top_sites_DRR <- topTable(fitDRR, coef = 2, number = Inf)
-EnhancedVolcano(top_sites_DRR, 
+q2 <- EnhancedVolcano(top_sites_DRR, 
                 lab = rownames(top_sites_DRR), 
                 x = "logFC", 
-                y = "P.Value")
+                y = "P.Value",
+                title = NULL,
+                subtitle = "Methylation Sites")
 
 
 
@@ -64,7 +70,9 @@ fitDRDC <- eBayes(fitDRDC)
 
 # check the top methylation sites using topTable()
 top_sites_DRDC <- topTable(fitDRDC, coef = 2, number = Inf)
-EnhancedVolcano(top_sites_DRDC, 
+p2 <- EnhancedVolcano(top_sites_DRDC, 
                 lab = rownames(top_sites_DRDC), 
                 x = "logFC", 
-                y = "P.Value")
+                y = "P.Value",
+                title = NULL,
+                subtitle = "Methylation Sites")

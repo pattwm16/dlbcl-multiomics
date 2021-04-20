@@ -11,6 +11,7 @@ header-includes:
   - \usepackage{graphicx}
   - \AtBeginDocument{\title[DLBCL Multiomics]{Elucidating gene networks precipitating relapse in CAR T-Cell treated diffuse large B-cell lymphoma}}
   - \titlegraphic{\includegraphics[width=0.3\paperwidth]{\string images/cclogo.jpg}} 
+bibliography: presentation.bib
 date: "8/28/2020"
 output: 
   beamer_presentation: 
@@ -35,7 +36,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## What: Diffuse Large B-Cell Lymphoma
 
-```{r, fig.align='center', out.width="45%", fig.cap = "Micrograph of DLBCL (Field stain)"}
+```{r, fig.align='center', out.width="40%", fig.cap = "Micrograph of DLBCL (Field stain)"}
 knitr::include_graphics("images/dlbcl_stain.jpg")
 ```
 
@@ -83,11 +84,33 @@ Three step process for gene network extraction:
 
 3. Visualize networks.
 
-## Diagnostic Samples Only: Gene Expression
+## Data
 
-```{r, DRR_gene_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
+Samples collected from 33 patients with DLBCL
+
+- Diagnostic samples were used to initially diagnose patients with DLBCL
+
+- Relapsed/cured samples were taken post CAR T-cell treatment
+
+- Relapsed/cured samples are not necessarily from same diagnostic individual
+
+
+```{r, the_datawarning=FALSE, message=FALSE}
+library(kableExtra)
+library(dplyr)
+
 load("~/Box/data/DLBCL_multi_omics.rdata")
 
+wk.pheno %>% 
+  group_by(Status) %>% 
+  count() %>%
+  kbl(booktabs = T) %>%
+  kable_styling(position = "center")
+```
+
+## Diagnostic v. Relapsed Samples: Gene Expression
+
+```{r, DRR_gene_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
 # Generate volcano plots
 
 library(EnhancedVolcano)
@@ -106,16 +129,16 @@ fitDRR <- eBayes(fitDRR)
 top_genes_DRR <- topTable(fitDRR, coef = 2, number = Inf,
                           adjust.method = "BH")
 
-EnhancedVolcano(top_genes_DRR, 
+p1 <- EnhancedVolcano(top_genes_DRR, 
                 lab = rownames(top_genes_DRR), 
                 x = "logFC", 
                 y = "P.Value",
                 title = NULL,
-                subtitle = NULL)
+                subtitle = "Gene Expression")
 ```
 
 
-## Diagnostic Samples Only: Methylation Sites
+## Diagnostic v. Relapsed Samples: Methylation Sites
 
 ```{r, DRR_methyl_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
 DRR <- which(wk.pheno$Status %in% c("Diagnostic","Relapsed"))
@@ -128,22 +151,22 @@ fitDRR <- eBayes(fitDRR)
 
 # check the top methylation sites using topTable()
 top_sites_DRR <- topTable(fitDRR, coef = 2, number = Inf)
-EnhancedVolcano(top_sites_DRR, 
+p2 <- EnhancedVolcano(top_sites_DRR, 
                 lab = rownames(top_sites_DRR), 
                 x = "logFC", 
                 y = "P.Value",
                 title = NULL,
-                subtitle = NULL)
+                subtitle = "Methylation Sites")
 ```
 
 
-## Diagnostic Samples Only: Gene Network Analysis
+## Diagnostic v. Relapsed Samples: Gene Network Analysis
 
 ```{r, DRR_genenet, fig.align='center', out.width="70%"}
 knitr::include_graphics("images/DRRNet1.png")
 ```
 
-## Diagnostic vs. Relapsed Patients: Gene Expression
+## Diagnostic vs. Cured Samples: Gene Expression
 ```{r, DRDC_gene_volcano, warning=FALSE, message=FALSE, out.height="85%", dev='png', cache=TRUE}
 DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
 datDRDC <- wk.pheno[DRDC, ]
@@ -163,7 +186,7 @@ EnhancedVolcano(top_genes_DRDC,
                 subtitle = NULL)
 ```
 
-## Diagnostic vs. Relapsed Patients: Methylation Sites
+## Diagnostic vs. Cured Samples: Methylation Sites
 
 ```{r, message=FALSE, dev='png', DRDC_methyl_volcano, warning=FALSE, out.height="85%", cache=TRUE}
 DRDC <- which(wk.pheno$Status %in% c("Diagnostic","Cured"))
@@ -186,15 +209,13 @@ EnhancedVolcano(top_sites_DRDC,
 ```
 
 
-## Diagnostic vs. Relapsed Patients: Gene Network Analysis
+## Diagnostic vs. Cured Samples: Gene Network Analysis
 
 ```{r, DRDC_genenet, fig.align='center', out.width="70%"}
 knitr::include_graphics("images/DRDCNet1.png")
 ```
 
 ## SmCCNet identifies key DLBCL genes from literature
-
-[INSERT EXAMPLES OF GENES]
 
 | Gene | Function | OMIM | Citation |
 |---------------|-------------|------|---------|
